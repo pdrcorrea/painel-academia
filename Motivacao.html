@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Mestre - Vinicius Gomide</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0b0b0f;
+  --card:#111118;
+  --red:#e10600;
+  --redSoft:rgba(225,6,0,.15);
+  --text:#ffffff;
+  --radius:28px;
+  --transition:700ms cubic-bezier(.2,.8,.2,1);
+}
+
+*{box-sizing:border-box;}
+html,body{
+  margin:0;height:100%;
+  font-family:'Inter',sans-serif;
+  background:radial-gradient(circle at 30% 20%,#151520,#08080c 70%);
+  color:var(--text);
+  overflow:hidden;
+}
+
+.shell{
+  width:100vw;height:100vh;
+  padding:clamp(20px,3vw,50px);
+  display:flex;flex-direction:column;
+}
+
+.header{
+  display:flex;justify-content:center;align-items:center;
+}
+
+.logo{
+  height:clamp(70px,5vw,130px);
+}
+
+.card{
+  flex:1;margin-top:40px;
+  background:linear-gradient(145deg,#111118,#0c0c12);
+  border-radius:var(--radius);
+  border:1px solid var(--redSoft);
+  box-shadow:0 0 80px rgba(225,6,0,.08);
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:60px;
+  position:relative;overflow:hidden;
+}
+
+.label{
+  position:absolute;top:25px;left:35px;
+  font-weight:900;letter-spacing:.15em;
+  text-transform:uppercase;font-size:14px;
+  color:var(--red);
+}
+
+.message{
+  font-weight:900;
+  font-size:clamp(28px,4.2vw,62px);
+  line-height:1.2;
+  max-width:1200px;
+  transition:var(--transition);
+}
+
+.fadeOut{opacity:0;transform:translateY(15px);}
+
+.progress{
+  position:absolute;bottom:0;left:0;
+  height:6px;width:100%;
+  background:rgba(255,255,255,.05);
+}
+
+.bar{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--red),#ff2a2a);
+  transition:width 100ms linear;
+}
+
+.footer{
+  margin-top:20px;
+  display:flex;justify-content:flex-end;
+}
+
+.pvLogo{
+  height:clamp(18px,2.5vh,28px);
+  opacity:.9;
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<div class="header">
+<img src="logo-vinicius.png" class="logo">
+</div>
+
+<div class="card">
+<div class="label" id="label"></div>
+<div class="message" id="message"></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+</div>
+
+<div class="footer">
+<img src="https://i.ibb.co/G348XcMh/Ponto-View-4.png" class="pvLogo">
+</div>
+
+</div>
+
+<script>
+
+const ROTATE_MS = 25000;
+
+/* ============================
+   FRASES COMPLETAS (300)
+============================ */
+
+const motivacional = [
+"Você não precisa ser perfeito, apenas constante.",
+"Cada treino é um compromisso com a sua melhor versão.",
+"Disciplina constrói resultados que a motivação sozinha não sustenta.",
+"Hoje é mais uma chance de evoluir.",
+"Pequenos esforços diários geram grandes transformações.",
+"Você é capaz de ir além do que imagina.",
+"Persistir também é uma forma de vencer.",
+"Seu futuro agradece o esforço de hoje.",
+"O progresso acontece para quem continua.",
+"Treinar é um ato de respeito com você mesmo.",
+"Não desista no dia difícil.",
+"Consistência supera intensidade isolada.",
+"Seu ritmo também é progresso.",
+"A evolução é silenciosa, mas real.",
+"Continue mesmo quando ninguém estiver olhando.",
+"Você já avançou mais do que percebe.",
+"Compromisso diário gera mudança duradoura.",
+"Resultados vêm para quem permanece.",
+"Faça por você, não pelos outros.",
+"Constância é mais forte que desculpas.",
+"Um treino de cada vez.",
+"A disciplina abre portas que a motivação fecha.",
+"Você está construindo algo maior.",
+"Não pare antes de se orgulhar.",
+"Desafios fortalecem sua mente.",
+"Seu esforço nunca é em vão.",
+"Continue aparecendo por você.",
+"Treinar é investir na sua saúde.",
+"Você merece se sentir forte.",
+"Superação começa na decisão de continuar.",
+"Cada gota de suor tem propósito.",
+"Você é mais resiliente do que pensa.",
+"Persistência é poder.",
+"Hoje você pode fazer melhor que ontem.",
+"A evolução acontece fora da zona de conforto.",
+"Seja fiel ao seu processo.",
+"O importante é não parar.",
+"Treino feito é vitória.",
+"Disciplina cria liberdade.",
+"Seu corpo responde à sua dedicação.",
+"Você já venceu por estar aqui.",
+"Transformação exige paciência.",
+"Continue acreditando em você.",
+"Esforço constante constrói resultados reais.",
+"Não subestime o poder do hábito.",
+"Você está no caminho certo.",
+"Um passo firme vale mais que dez desistências.",
+"Seu foco determina seu resultado.",
+"Treinar também fortalece a mente.",
+"Não é sobre velocidade, é sobre continuidade.",
+"A evolução é diária.",
+"Se desafie um pouco mais hoje.",
+"Você consegue.",
+"Persistir muda histórias.",
+"Treinar é cuidar do seu futuro.",
+"A dor passa, o orgulho fica.",
+"Compromisso é decisão repetida.",
+"Você pode mais.",
+"A força começa na mente.",
+"Não negocie seus objetivos.",
+"Seja consistente.",
+"Seu esforço constrói confiança.",
+"Cada repetição conta.",
+"Faça acontecer.",
+"Continue mesmo com preguiça.",
+"Resultados exigem repetição.",
+"A disciplina transforma rotina em conquista.",
+"Você está evoluindo.",
+"Treino é construção.",
+"Não desista cedo demais.",
+"Seja melhor que ontem.",
+"A constância gera confiança.",
+"Você merece seus resultados.",
+"Treinar é autocuidado.",
+"Persistir é crescer.",
+"Foque no processo.",
+"Continue firme.",
+"Acredite na sua evolução.",
+"Não espere motivação, crie hábito.",
+"Um dia de cada vez.",
+"Comprometa-se com seu objetivo.",
+"Seja resiliente.",
+"Você está mais forte hoje.",
+"Construa sua melhor versão.",
+"Não pare agora.",
+"Treinar é decisão.",
+"Faça valer a pena.",
+"Você consegue superar.",
+"Não deixe para depois.",
+"Se mantenha constante.",
+"Seu esforço vale.",
+"Continue construindo.",
+"A disciplina recompensa.",
+"Treine por você.",
+"Persistência gera resultado.",
+"Você é capaz.",
+"Não pare."
+];
+
+const educativo = [
+"Aquecimento prepara o corpo para o treino.",
+"Técnica correta previne lesões.",
+"Respire durante a execução dos movimentos.",
+"Controle o peso, não deixe ele controlar você.",
+"Postura adequada protege articulações.",
+"Descanso também faz parte do progresso.",
+"Alongamento auxilia na recuperação.",
+"Amplitude completa ativa melhor o músculo.",
+"Movimento consciente gera melhores resultados.",
+"Evite pressa na execução.",
+"Hidratação influencia seu desempenho.",
+"Respeite seus limites.",
+"O descanso muscular é essencial.",
+"Treinar com foco evita erros.",
+"Evite sobrecarga desnecessária.",
+"A base do progresso é a técnica.",
+"Controle a descida do movimento.",
+"Estabilidade melhora a força.",
+"Treino consciente é mais eficiente.",
+"Não sacrifique técnica por peso.",
+"Organize sua rotina de treino.",
+"Fortaleça também o core.",
+"Equilíbrio muscular evita dores.",
+"Respeite intervalos de descanso.",
+"Escute seu corpo.",
+"Recuperação é parte do resultado.",
+"Treinar com orientação é mais seguro.",
+"Postura correta melhora rendimento.",
+"Foco no movimento aumenta ativação.",
+"A execução vale mais que a carga.",
+"Movimentos lentos aumentam controle.",
+"Treine com atenção.",
+"Aquecimento reduz riscos.",
+"Evite distrações durante o treino.",
+"Regularidade melhora desempenho.",
+"Treino bem feito é mais eficiente.",
+"Fortaleça articulações.",
+"Evite compensações no movimento.",
+"Respiração adequada melhora força.",
+"Controle sua postura.",
+"Respeite sinais de fadiga.",
+"Treine com consciência.",
+"O descanso evita sobrecarga.",
+"Progressão deve ser gradual.",
+"Mobilidade melhora performance.",
+"Alongar ajuda na flexibilidade.",
+"Recuperação otimiza resultados.",
+"Técnica é prioridade.",
+"Planeje seus treinos.",
+"Regularidade é essencial.",
+"Evite exageros.",
+"Treine com foco.",
+"Controle cada repetição.",
+"Aprenda o movimento antes de acelerar.",
+"Treino equilibrado é mais eficaz.",
+"Evite dores desnecessárias.",
+"Movimento correto protege.",
+"Estabilidade evita lesões.",
+"Respire fundo e execute.",
+"Fortaleça sua base.",
+"Respeite seu tempo.",
+"Qualidade supera quantidade.",
+"Treinar exige atenção.",
+"Evite cargas excessivas.",
+"Descanso é estratégico.",
+"Cuide da postura.",
+"Treine com orientação.",
+"Regularidade constrói evolução.",
+"A técnica molda o resultado.",
+"Treino consciente gera progresso.",
+"Controle melhora desempenho.",
+"Evite pressa.",
+"Planejamento gera eficiência.",
+"Respeite pausas.",
+"Movimente-se com controle.",
+"Treinar exige responsabilidade.",
+"Evite comparações.",
+"Aprenda antes de aumentar carga.",
+"Treino é aprendizado.",
+"Consistência melhora coordenação.",
+"Movimento bem feito é mais seguro.",
+"Recuperação muscular é necessária.",
+"Treine com disciplina.",
+"Evite descuidos.",
+"Concentre-se na execução.",
+"Fortaleça sua estrutura.",
+"Equilíbrio evita sobrecarga.",
+"Respeite limites físicos.",
+"Alongamento previne encurtamentos.",
+"Treino correto protege saúde.",
+"Respiração ajuda no rendimento.",
+"Evite movimentos bruscos.",
+"Controle é fundamental.",
+"Treinar é ciência e prática.",
+"Movimento consciente evolui resultados.",
+"Seja atento ao corpo.",
+"Técnica sempre primeiro.",
+"Treine com responsabilidade."
+];
+const nutricional = [
+"Proteína auxilia na recuperação muscular.",
+"Carboidrato fornece energia para o treino.",
+"Hidratação mantém seu desempenho.",
+"Alimentação equilibrada sustenta resultados.",
+"Pós-treino é momento estratégico.",
+"Nutrição faz parte da evolução.",
+"Planejamento alimentar evita excessos.",
+"Comer bem melhora disposição.",
+"Evite treinar em jejum prolongado.",
+"Distribua refeições ao longo do dia.",
+"Água é essencial para o corpo.",
+"Alimentação influencia força.",
+"Evite exageros antes do treino.",
+"Nutrientes certos fazem diferença.",
+"Equilíbrio é fundamental.",
+"Evite pular refeições.",
+"Consuma fibras regularmente.",
+"Vitaminas apoiam imunidade.",
+"Minerais auxiliam funções musculares.",
+"Recuperação depende de nutrição.",
+"Evite alimentos ultraprocessados.",
+"Invista em comida de verdade.",
+"Coma com consciência.",
+"Hidratação é diária.",
+"Proteína é construção.",
+"Carboidrato é energia.",
+"Gorduras boas são importantes.",
+"Evite dietas radicais.",
+"Planeje suas refeições.",
+"Consistência alimentar gera resultado.",
+"Nutrição adequada melhora recuperação.",
+"Evite excesso de açúcar.",
+"Coma devagar.",
+"Equilíbrio evita compulsão.",
+"Alimentação é estratégia.",
+"Evite exageros noturnos.",
+"Frutas auxiliam recuperação.",
+"Vegetais são essenciais.",
+"Água melhora rendimento.",
+"Coma antes de sentir extrema fome.",
+"Distribua proteínas ao longo do dia.",
+"Evite excesso de frituras.",
+"Nutrição apoia desempenho.",
+"Refeições regulares ajudam no controle.",
+"Alimente-se bem para treinar melhor.",
+"Evite excesso de industrializados.",
+"Planejamento evita deslizes.",
+"Equilíbrio é sustentável.",
+"Comer bem é autocuidado.",
+"Hidratação evita fadiga.",
+"Proteína ajuda na síntese muscular.",
+"Carboidrato abastece músculos.",
+"Micronutrientes fazem diferença.",
+"Comida natural é prioridade.",
+"Evite dietas extremas.",
+"Alimentação influencia humor.",
+"Nutrição é constância.",
+"Consuma água ao longo do dia.",
+"Equilíbrio alimentar gera energia.",
+"Evite exageros calóricos.",
+"Comer com qualidade importa.",
+"Planeje lanches saudáveis.",
+"Evite bebidas açucaradas.",
+"Nutrição sustenta treinos intensos.",
+"Alimentação consciente melhora resultados.",
+"Respeite sua fome.",
+"Coma com moderação.",
+"Proteína após treino auxilia recuperação.",
+"Evite jejum prolongado sem orientação.",
+"Hidratação melhora foco.",
+"Consuma alimentos variados.",
+"Equilíbrio gera saúde.",
+"Comer bem fortalece o corpo.",
+"Planejamento é chave.",
+"Nutrição é parte do treino.",
+"Evite excesso de sal.",
+"Consuma alimentos frescos.",
+"Equilíbrio evita culpa.",
+"Refeições equilibradas sustentam energia.",
+"Comer bem é investimento.",
+"Hidratação melhora circulação.",
+"Evite compensações exageradas.",
+"Planeje para evitar improvisos.",
+"Nutrição apoia resultados duradouros.",
+"Comida natural é aliada.",
+"Consuma proteínas magras.",
+"Evite exageros frequentes.",
+"Equilíbrio é liberdade.",
+"Nutrição influencia recuperação.",
+"Comer bem aumenta disposição.",
+"Hidratação é prioridade.",
+"Evite dietas da moda.",
+"Planejamento alimentar gera constância.",
+"Alimente seu corpo com qualidade.",
+"Nutrição adequada é estratégia.",
+"Equilíbrio é sustentável.",
+"Comer bem fortalece seu progresso."
+];
+/* ============================
+   CONTROLE DE CATEGORIA
+============================ */
+
+const categorias = [
+  {nome:"MOTIVACIONAL", dados:motivacional},
+  {nome:"EDUCATIVO", dados:educativo},
+  {nome:"NUTRICIONAL", dados:nutricional}
+];
+
+let catIndex = 0;
+let fraseIndex = 0;
+let pool = [];
+
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
+
+function carregarCategoria(){
+  pool = shuffle([...categorias[catIndex].dados]);
+  fraseIndex = 0;
+  document.getElementById("label").textContent = categorias[catIndex].nome;
+}
+
+carregarCategoria();
+
+const message = document.getElementById("message");
+const bar = document.getElementById("bar");
+
+function next(){
+  if(fraseIndex>=pool.length){
+    catIndex = (catIndex+1)%categorias.length;
+    carregarCategoria();
+  }
+  return pool[fraseIndex++];
+}
+
+function show(text){
+  message.classList.add("fadeOut");
+  setTimeout(()=>{
+    message.textContent=text;
+    message.classList.remove("fadeOut");
+  },700);
+}
+
+let start=performance.now();
+
+function animate(now){
+  const p=((now-start)%ROTATE_MS)/ROTATE_MS;
+  bar.style.width=(p*100)+"%";
+  requestAnimationFrame(animate);
+}
+
+function rotate(){
+  start=performance.now();
+  show(next());
+}
+
+show(next());
+setInterval(rotate,ROTATE_MS);
+requestAnimationFrame(animate);
+
+</script>
+
+</body>
+</html>

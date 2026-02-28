@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Clima Academia</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --red:#e10600;
+  --cold:#3b82f6;
+  --hot:#ff3b3b;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:Inter,sans-serif;
+  height:100vh;
+  background:#0b0b0f;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  overflow:hidden;
+  transition:background 1s ease;
+}
+
+/* ===== FUNDOS DINÂMICOS ===== */
+.sunny{background:radial-gradient(circle at 70% 20%, rgba(255,200,0,.25), transparent 40%), #0b0b0f;}
+.rain{background:linear-gradient(120deg,#101018,#07070b);}
+.cloud{background:#12121a;}
+.storm{background:radial-gradient(circle at 50% 10%, rgba(255,0,0,.2), transparent 50%), #07070b;}
+
+/* ===== HEADER ===== */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:25px 40px;
+}
+
+.logo{
+  height:clamp(70px,5vw,130px);
+}
+
+.city{
+  font-weight:700;
+  letter-spacing:.08em;
+  color:#ff4d4d;
+}
+
+/* ===== CARD CENTRAL ===== */
+.card{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.temp{
+  font-size:140px;
+  font-weight:900;
+  transition:.5s;
+}
+
+.temp.cold{color:var(--cold)}
+.temp.hot{color:var(--hot)}
+.temp.mild{color:white}
+
+.desc{
+  font-size:28px;
+  margin-top:10px;
+  opacity:.9;
+}
+
+.metrics{
+  display:flex;
+  gap:30px;
+  margin-top:40px;
+}
+
+.metric{
+  background:#151520;
+  padding:18px 28px;
+  border-radius:20px;
+  border:1px solid rgba(225,6,0,.2);
+  font-weight:600;
+}
+
+/* ===== FOOTER ===== */
+.footer{
+  display:flex;
+  justify-content:flex-end;
+  padding:15px 30px;
+}
+
+.pvLogo{
+  height:24px;
+  opacity:.85;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<img src="logo-vinicius.png" class="logo">
+<div class="city" id="city">COLATINA</div>
+</div>
+
+<div class="card">
+<div id="temp" class="temp mild">--°</div>
+<div id="desc" class="desc">Carregando clima...</div>
+
+<div class="metrics">
+<div class="metric" id="wind">🌬 -- km/h</div>
+<div class="metric" id="humidity">💧 --%</div>
+<div class="metric" id="feels">🌡 --°</div>
+</div>
+</div>
+
+<div class="footer">
+<img src="https://i.ibb.co/G348XcMh/Ponto-View-4.png" class="pvLogo">
+</div>
+
+<script>
+
+/* ===== FUNÇÕES ===== */
+
+function setTempColor(t){
+  const el=document.getElementById("temp");
+  el.className="temp";
+  if(t>=30) el.classList.add("hot");
+  else if(t<=19) el.classList.add("cold");
+  else el.classList.add("mild");
+}
+
+function setBackground(code){
+  document.body.className="";
+  if(code==0) document.body.classList.add("sunny");
+  else if(code<=3) document.body.classList.add("cloud");
+  else if(code<=67) document.body.classList.add("rain");
+  else if(code<=99) document.body.classList.add("storm");
+}
+
+function weatherText(code){
+  if(code==0) return "CÉU LIMPO";
+  if(code<=3) return "PARCIALMENTE NUBLADO";
+  if(code<=67) return "CHUVA";
+  if(code<=99) return "TEMPESTADE";
+  return "NUBLADO";
+}
+
+/* ===== CLIMA FIXO EM COLATINA (SUPER ESTÁVEL) ===== */
+async function loadWeather(){
+
+  const lat=-19.5397;
+  const lon=-40.6306;
+
+  try{
+    const response=await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code`
+    );
+
+    const data=await response.json();
+    const cur=data.current;
+
+    const t=Math.round(cur.temperature_2m);
+    const feels=Math.round(cur.apparent_temperature);
+
+    document.getElementById("temp").textContent=t+"°";
+    document.getElementById("wind").textContent="🌬 "+Math.round(cur.wind_speed_10m)+" km/h";
+    document.getElementById("humidity").textContent="💧 "+Math.round(cur.relative_humidity_2m)+"%";
+    document.getElementById("feels").textContent="🌡 "+feels+"°";
+    document.getElementById("desc").textContent=weatherText(cur.weather_code);
+
+    setTempColor(feels);
+    setBackground(cur.weather_code);
+
+  }catch(e){
+    document.getElementById("desc").textContent="SEM CONEXÃO";
+  }
+}
+
+loadWeather();
+setInterval(loadWeather,1000*60*20);
+
+</script>
+
+</body>
+</html>

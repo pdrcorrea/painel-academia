@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Hora - Vinicius Gomide</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0b0b0f;
+  --card:#111118;
+  --red:#e10600;
+  --redSoft:rgba(225,6,0,.15);
+  --text:#ffffff;
+  --radius:28px;
+}
+
+*{box-sizing:border-box;}
+
+html,body{
+  margin:0;
+  height:100%;
+  font-family:'Inter',sans-serif;
+  background:radial-gradient(circle at 30% 20%,#151520,#08080c 70%);
+  color:var(--text);
+  overflow:hidden;
+}
+
+.shell{
+  width:100vw;
+  height:100vh;
+  padding:clamp(20px,3vw,50px);
+  display:flex;
+  flex-direction:column;
+}
+
+.header{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.logo{
+  height:clamp(70px,5vw,130px);
+}
+
+.card{
+  flex:1;
+  margin-top:40px;
+  background:linear-gradient(145deg,#111118,#0c0c12);
+  border-radius:var(--radius);
+  border:1px solid var(--redSoft);
+  box-shadow:0 0 80px rgba(225,6,0,.08);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:60px;
+  position:relative;
+}
+
+.label{
+  position:absolute;
+  top:25px;
+  left:35px;
+  font-weight:900;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  font-size:14px;
+  color:var(--red);
+}
+
+.clock{
+  font-weight:900;
+  font-size:clamp(60px,10vw,180px);
+  letter-spacing:.05em;
+}
+
+.date{
+  margin-top:20px;
+  font-size:clamp(18px,2vw,32px);
+  font-weight:400;
+  opacity:.8;
+}
+
+.progress{
+  position:absolute;
+  bottom:0;
+  left:0;
+  height:6px;
+  width:100%;
+  background:rgba(255,255,255,.05);
+}
+
+.bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--red),#ff2a2a);
+  transition:width 1s linear;
+}
+
+.footer{
+  margin-top:20px;
+  display:flex;
+  justify-content:flex-end;
+}
+
+.pvLogo{
+  height:clamp(18px,2.5vh,28px);
+  opacity:.9;
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<div class="header">
+<img src="logo-vinicius.png" class="logo">
+</div>
+
+<div class="card">
+<div class="label">HORÁRIO ATUAL</div>
+<div class="clock" id="clock">00:00:00</div>
+<div class="date" id="date">Carregando...</div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+</div>
+
+<div class="footer">
+<img src="https://i.ibb.co/G348XcMh/Ponto-View-4.png" class="pvLogo">
+</div>
+
+</div>
+
+<script>
+
+function atualizarHora(){
+  const agora = new Date();
+
+  const horas = agora.getHours().toString().padStart(2,'0');
+  const minutos = agora.getMinutes().toString().padStart(2,'0');
+  const segundos = agora.getSeconds().toString().padStart(2,'0');
+
+  document.getElementById("clock").textContent = `${horas}:${minutos}:${segundos}`;
+
+  const opcoes = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  document.getElementById("date").textContent = agora.toLocaleDateString('pt-BR', opcoes);
+
+  document.getElementById("bar").style.width = (segundos/60)*100 + "%";
+}
+
+setInterval(atualizarHora,1000);
+atualizarHora();
+
+</script>
+
+</body>
+</html>
